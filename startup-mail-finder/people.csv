@@ -1,0 +1,18 @@
+company,name,role,email_public,email_guesses,confidence,domain,website,source
+Ageospatial,Maaz Sheikh,,maaz.sheikh@ageospatial.com,maaz@ageospatial.com;msheikh@ageospatial.com;maazsheikh@ageospatial.com;m.sheikh@ageospatial.com,high,ageospatial.com,https://ageospatial.com,mailto
+Ageospatial,,общий ящик на нескольких сотрудников,support@ageospatial.com,,high,ageospatial.com,https://ageospatial.com,mailto
+Ageospatial,,,contact@ageospatial.com,,high,ageospatial.com,https://ageospatial.com,mailto
+antimattr,,,support@antimattr.one,,high,antimattr.one,https://www.antimattr.one,mailto
+antimattr,,,team@antimattr.one,,high,antimattr.one,https://www.antimattr.one,mailto
+antimattr,,,future@antimattr.one,,high,antimattr.one,https://www.antimattr.one,mailto
+Asim,,,contact@asim-group.com,,high,asim-group.com,https://www.asim-group.com,mailto
+Cyclon,,,contact@cyclon.ai,,high,cyclon.ai,https://cyclon.ai,mailto
+GrayPass,,,founders@graypass.org,,high,graypass.org,https://www.graypass.org,mailto
+Hesper AI,,,support@gethesperai.com,,high,gethesperai.com,https://gethesperai.com,mailto
+Hesper AI,,,hello@gethesperai.com,,high,gethesperai.com,https://gethesperai.com,ld+json
+Maritime,,,contact@maritime.sh,,high,maritime.sh,https://maritime.sh,mailto
+Memorable,,,info@memorable.sh,,high,memorable.sh,https://www.memorable.sh,mailto
+OpenHack,,,security@openhack.com,,high,openhack.com,https://openhack.com,mailto
+OpenHack,,,ananay@openhack.com,,high,openhack.com,https://openhack.com,mailto
+Perit.AI,,,support@perit.ai,,high,perit.ai,https://www.perit.ai,mailto
+Sintropix,,,alfonso@sintropix.com,,high,sintropix.com,https://sintropix.com,ld+json

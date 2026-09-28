@@ -1,0 +1,18 @@
+To: contact@ageospatial.com
+Subject: Bewerbung — Data Engineer (Ivan Petrov)
+Guten Tag Team Ageospatial,
+
+ich heiße Ivan Petrov und bewerbe mich um die Position Data Engineer bei Ageospatial.
+
+Делаю ETL на Spark.
+
+Mein Lebenslauf liegt diesem Schreiben bei. Für Rückfragen bin ich unter
+ivan@example.com erreichbar.
+
+Mit freundlichen Grüßen
+Ivan Petrov
+
+
+--
+Diese Nachricht wurde einmalig manuell verfasst und nicht automatisiert versendet.
+Wenn Sie keine weiteren Nachrichten wünschen, melden Sie sich bitte kurz.
