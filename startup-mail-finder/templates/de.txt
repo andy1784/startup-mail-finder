@@ -1,0 +1,18 @@
+Subject: Bewerbung — {role} ({your_name})
+
+Guten Tag {team},
+
+ich heiße {your_name} und bewerbe mich um die Position {role} bei {company}.
+
+{why_us}
+
+Mein Lebenslauf liegt diesem Schreiben bei. Für Rückfragen bin ich unter
+{your_email} erreichbar.
+
+Mit freundlichen Grüßen
+{your_name}
+{phone}
+
+--
+Diese Nachricht wurde einmalig manuell verfasst und nicht automatisiert versendet.
+Wenn Sie keine weiteren Nachrichten wünschen, melden Sie sich bitte kurz.

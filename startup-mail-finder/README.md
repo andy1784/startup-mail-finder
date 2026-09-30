@@ -31,8 +31,8 @@ API (OpenStreetMap, Wikidata, Y Combinator, Google Places) и данные,
 ## Установка
 
 ```bash
-pip3 install requests beautifulsoup4 dnspython   # dnspython — опционально (MX)
-sudo apt install chromium                       # опционально, для SPA-сайтов
+pip3 install -r requirements.txt
+sudo apt install chromium
 ```
 
 ## Использование
@@ -44,17 +44,38 @@ python3 scout.py wikidata --limit 50 --countries de,ee,il -o companies.csv
 python3 scout.py yc --limit 200 -o companies.csv
 python3 scout.py places --query "startup" --region DE -o companies.csv   # нужен ключ
 
-# 2. деловые ящики компаний
-python3 scout.py emails -i companies.csv -o leads.csv --workers 6 --js
+# 2. склеить несколько источников по домену
+python3 scout.py merge -i yc.csv osm.csv wikidata.csv -o companies.csv
 
-# 3. первые лица: имена + их адреса
-python3 scout.py people -i companies.csv -o people.csv --workers 5
+# 3. деловые ящики компаний (--resume не обходит уже записанные домены)
+python3 scout.py emails -i companies.csv -o leads.csv --workers 6 --js --resume
 
-# 4. черновики писем (отправляешь сам, из своего клиента)
-python3 scout.py drafts -i leads.csv --name "Ivan Petrov" --email "ivan@example.com" \
-    --role "Data Engineer" --why "Делаю ETL на Spark, хочу в команду, где данные близко к продукту."
-python3 scout.py drafts --people people.csv --name "Ivan Petrov" --email "..." --role "Data Engineer"
+# 4. первые лица: имена + их адреса
+python3 scout.py people -i companies.csv -o people.csv --workers 5 --resume
+python3 scout.py people -i companies.csv -o people.csv --verify-smtp
+
+# 5. черновики писем (отправляешь сам, из своего клиента)
+python3 scout.py drafts -i leads.csv --lang en --name "Ivan Petrov" --email "ivan@example.com" \
+    --role "Data Engineer" --why "I build ETL on Spark and want to sit close to the product."
+python3 scout.py drafts --people people.csv --lang de --name "Ivan Petrov" --email "..." --role "Data Engineer"
+
+# 6. весь пайплайн одной командой
+python3 scout.py run --sources yc,osm --city Berlin --limit 40 --js \
+    --name "Ivan Petrov" --email "ivan@example.com" --role "Data Engineer" --lang en
+
+# 7. отправка через твой SMTP (сначала dry-run, потом --confirm)
+export SMTP_HOST=smtp.gmail.com
+export SMTP_PORT=587
+export SMTP_USER=you@gmail.com
+export SMTP_PASSWORD=app-password
+export SMTP_FROM=you@gmail.com
+python3 scout.py send --outdir outreach --name "Ivan Petrov" --limit 5
+python3 scout.py send --outdir outreach --name "Ivan Petrov" --limit 5 --confirm --attach CV.pdf
 ```
+
+`send` без `--confirm` ничего не отправляет. Уже посланные адреса пишутся в `outreach/sent.log` и пропускаются. Guess-адреса по умолчанию не шлются.
+
+Выходные CSV и `outreach/` в git не коммитятся (см. `.gitignore`).
 
 Google Places (если есть ключ):
 
@@ -85,6 +106,7 @@ export GOOGLE_PLACES_API_KEY=...
 | `email_public` | адрес, опубликованный на сайте компании |
 | `email_guesses` | адреса, построенные по корпоративному шаблону |
 | `confidence` | `high` / `medium` / `guess` — см. ниже |
+| `smtp` | `ok` / `catch-all` / `reject` / пусто — результат RCPT при `--verify-smtp` |
 
 ## Как ищутся люди (замена LinkedIn)
 
@@ -101,9 +123,9 @@ export GOOGLE_PLACES_API_KEY=...
 
 - `high` — адрес опубликован на сайте самой компании;
 - `medium` — опубликован, но на другом домене (обычно группа компаний);
-- `guess` — построен по шаблону, **не проверен**. Такие письма помечаются в
-  черновике комментарием. Неверный адрес хуже, чем общий `info@`, поэтому
-  перед отправкой проверь их вручную.
+- `guess` — построен по шаблону. С `--verify-smtp` проверяется через SMTP
+  `RCPT TO` (письмо не отправляется). `ok` поднимает адрес, `reject` отбрасывает,
+  `catch-all` не доказывает существование ящика. Без флага — не проверен.
 
 ## Как это устроено
 
@@ -123,9 +145,15 @@ export GOOGLE_PLACES_API_KEY=...
   Плюс деобфускация `name (at) domain (dot) com`.
 - **Приоритет адреса**: свой домен +40, freemail +15, чужой домен −25
   (обычно агентство или мусор из бандла), `hr@/jobs@/careers@` +100.
-- **Фолбэки реальности**: битый SSL (`verify=False`), несуществующий `www.`,
-  мёртвый хост, 504 Overpass (повтор на том же зеркале, потом следующее),
-  0 совпадений (автоповтор с более широким фильтром).
+  Плейсхолдеры из шаблонов сайтов (`you@email.com`, `name@company.com`,
+  `jane@acme.com`) отбрасываются.
+- **Фолбэки реальности**: битый SSL (`verify=False`, пишется в stderr один раз
+  на хост), несуществующий `www.`, мёртвый хост, 504 Overpass (повтор на том же
+  зеркале, потом следующее), 0 совпадений (автоповтор с более широким фильтром).
+- **Черновики**: `--lang en` (YC/US, по умолчанию) или `--lang de` (DACH).
+  Свои тексты — `templates/en.txt` / `templates/de.txt` и `--template`.
+- **Код**: `scout.py` — CLI, логика в `scoutlib/` (`sources`, `crawl`, `people`,
+  `emails`, `drafts`).
 - **Overpass не любит браузерный UA**: их Apache отвечает `406` на строку,
   мимикрирующую под Chrome. Для API отправляется честный бот-UA, для обхода
   сайтов — браузерный, иначе сайты банят.
@@ -145,9 +173,9 @@ export GOOGLE_PLACES_API_KEY=...
 - У части компаний (ratiodata, Microsoft) публичного email нет вообще — форма
   отправки или виджет. Такие строки получают `note = no_public_email`.
 - `pages_crawled=0` — сайт не открылся: сеть, DNS, мёртвый хост.
-- Адреса с `confidence=guess` не проверяются на существование. MX бывает, а
-  ящик давно мёртв. Не гони трафик на мёртвые адреса: для отклика лучше
-  написать HR через форму на `/careers`, чем в несуществующий ящик.
+- Адреса с `confidence=guess` без `--verify-smtp` не проверяются на существование.
+  MX бывает, а ящик давно мёртв. Catch-all MX принимает любой local-part —
+  `smtp=catch-all` не значит, что ящик жив. Не гони трафик на мёртвые адреса.
 - Сайты отдают контакты нестабильно: между прогонами разница бывает
   (`bewerbung@` то находится, то нет).
 

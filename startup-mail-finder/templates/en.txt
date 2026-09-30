@@ -1,0 +1,17 @@
+Subject: Application — {role} ({your_name})
+
+Hi {team},
+
+I'm {your_name}, applying for the {role} role at {company}.
+
+{why_us}
+
+I've attached my resume. You can reach me at {your_email}.
+
+Best,
+{your_name}
+{phone}
+
+--
+This message was written once, by hand, and is not an automated campaign.
+If you'd rather not hear from me again, just say so and I won't follow up.
